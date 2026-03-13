@@ -95,6 +95,8 @@ def __select(ctx, extend_objects=False, all=None, uid=[], abort_on_missing_uid=N
             comp_filter='VEVENT'
         if kwargs_['todo']:
             comp_filter='VTODO'
+        if kwargs_.get('journal'):
+            comp_filter='VJOURNAL'
         cnt = 0
         for c in ctx.obj['calendars']:
             try:
@@ -424,6 +426,17 @@ def _add_todo(ctx, **kwargs):
             todo.save()
         click.echo(f"uid={todo.id}")
     return todo
+
+def _add_journal(ctx, **kwargs):
+    kwargs['summary'] = " ".join(kwargs['summary'])
+    _process_set_args(ctx, kwargs)
+    if not ctx.obj['set_args']['summary']:
+        _abort("denying to add a JOURNAL with no summary given")
+        return
+    for cal in ctx.obj['calendars']:
+        journal = cal.save_journal(ical=ctx.obj.get('ical_fragment', ""), **ctx.obj['set_args'], no_overwrite=True)
+        click.echo(f"uid={journal.id}")
+    return journal
 
 def _add_event(ctx, timespec, **kwargs):
     _process_set_args(ctx, kwargs)

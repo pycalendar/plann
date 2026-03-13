@@ -24,6 +24,7 @@ import caldav
 
 from plann.commands import (
     _add_event,
+    _add_journal,
     _add_todo,
     _agenda,
     _cats,
@@ -153,6 +154,7 @@ def _set_attr_options(verb="", desc=""):
 @click.option('--abort-on-missing-uid/--ignore-missing-uid', default=False, help='Abort if (one or more) uids are not found (default: silently ignore missing uids).  Only effective when used with --uid')
 @click.option('--todo/--no-todo', default=None, help='select only todos (or no todos)')
 @click.option('--event/--no-event', default=None, help='select only events (or no events)')
+@click.option('--journal/--no-journal', default=None, help='select only journal entries (or no journal entries)')
 @click.option('--include-completed/--exclude-completed', default=False, help='select only todos (or no todos)')
 @_set_attr_options(desc="select by")
 @_set_attr_options('no', desc="select objects without")
@@ -429,9 +431,20 @@ def event(ctx, timespec, **kwargs):
     """
     _add_event(ctx, timespec, **kwargs)
 
-def journal():
-    click.echo("soon you should be able to add journal entries to your calendar")
-    raise NotImplementedError("foo")
+@add.command()
+@click.argument('summary', nargs=-1)
+@_set_attr_options(verb='set')
+@click.pass_context
+def journal(ctx, **kwargs):
+    """
+    Creates a new journal entry with given SUMMARY.
+
+    Examples:
+
+    plann add journal "bought new keyboard"
+    plann add journal --set-dtstart=2024-01-15 "sick day"
+    """
+    return _add_journal(ctx, **kwargs)
 
 ## CONVENIENCE COMMANDS
 

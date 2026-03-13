@@ -16,7 +16,7 @@ import aiohttp.web
 import niquests as requests
 from xandikos.web import XandikosApp, XandikosBackend
 
-from plann.cli import _add_todo, _check_for_panic, _list, _select
+from plann.cli import _add_journal, _add_todo, _check_for_panic, _list, _select
 from plann.interactive import (
     _interactive_edit,
     _interactive_relation_edit,
@@ -199,6 +199,15 @@ def test_plann():
         #assert len(ctx.obj['objs'])==1
         _select(ctx, summary='make plann good', todo=True)
         assert len(ctx.obj['objs'])==1
+        _select(ctx, event=True)
+        assert len(ctx.obj['objs'])==0
+
+        ## Journal tests
+        journal1 = _add_journal(ctx, summary=['bought new keyboard'], set_dtstart='2012-12-20')
+        _select(ctx, journal=True)
+        assert len(ctx.obj['objs'])==1
+        _select(ctx, todo=True)
+        assert len(ctx.obj['objs'])==2
         _select(ctx, event=True)
         assert len(ctx.obj['objs'])==0
 
