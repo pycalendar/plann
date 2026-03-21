@@ -29,7 +29,7 @@ dependencies = [
     "PyYAML",
     "sortedcontainers",
     "tzlocal",
-    "python-dateutil",
+    "dateparser>=1.2",
     "icalendar",
 ]
 

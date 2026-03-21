@@ -163,6 +163,36 @@ class TestParseTimestamp:
         }
         self._testTimeSpec(expected)
 
+class TestNaturalLanguage:
+    """Tests for natural language date parsing enabled by switching to dateparser."""
+
+    def test_yesterday(self):
+        tz.implicit_timezone = "Europe/Oslo"
+        result = parse_dt("yesterday")
+        expected_date = (datetime.now().astimezone() - timedelta(days=1)).date()
+        assert result.date() == expected_date
+
+    def test_today(self):
+        tz.implicit_timezone = "Europe/Oslo"
+        result = parse_dt("today")
+        assert result.date() == datetime.now().astimezone().date()
+
+    def test_relative_hours_ago(self):
+        tz.implicit_timezone = "Europe/Oslo"
+        result = parse_dt("3 hours ago")
+        expected = datetime.now().astimezone() - timedelta(hours=3)
+        assert abs((result - expected).total_seconds()) < 5
+
+    def test_day_name(self):
+        tz.implicit_timezone = "Europe/Oslo"
+        result = parse_dt("Monday")
+        assert result.weekday() == 0  # Monday
+
+    def test_invalid_raises(self):
+        with pytest.raises(ValueError):
+            parse_dt("not a date at all !!!!")
+
+
 def test_ensure_ts():
     now = datetime.now()
     utcnow = now.astimezone(utc)
