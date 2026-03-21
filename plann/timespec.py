@@ -3,8 +3,7 @@ import re
 import zoneinfo
 from dataclasses import dataclass
 
-import dateutil
-import dateutil.parser
+import dateparser
 
 """
 Most important content:
@@ -13,7 +12,8 @@ Most important content:
 * parse_timespec - parses a string (which may be a timestamp or an interval) into two datetimes
 * tz - a singleton containing the default timezones to be used
 
-parse_dt supports things like "+2h" or "now", while parse_timespec doesn't.
+parse_dt supports things like "+2h", "now", "yesterday", or "3 hours ago",
+while parse_timespec doesn't.
 
 The naming of those two are a bit arbitrary and may be changed in a future version of the library.  Old names will then continue working as legacy aliases.
 """
@@ -104,14 +104,17 @@ def _parse_dt(input, return_type=None):
         if return_type is datetime.datetime:
             return _ensure_ts(input)
         return input
-    ## dateutil.parser.parse does not recognize 'now'
     if input == 'now':
         ret = _now()
-    ## dateutil.parser.parse does not recognize '+2 hours', like date does.
     elif input.startswith('+'):
         ret = parse_add_dur(_now(), input[1:])
     else:
-        ret = dateutil.parser.parse(input)
+        settings: dict = {"RETURN_AS_TIMEZONE_AWARE": True, "PREFER_DATES_FROM": "current_period"}
+        if tz.implicit_timezone:
+            settings["TIMEZONE"] = str(tz.implicit_timezone)
+        ret = dateparser.parse(input, settings=settings)
+        if ret is None:
+            raise ValueError(f"Could not parse datetime string: {input!r}")
     if return_type is datetime.datetime:
         return _ensure_ts(ret)
     elif return_type is datetime.date:
@@ -209,12 +212,12 @@ def _parse_timespec(timespec):
             end = parse_add_dur(start, rx.group(2))
             return (start, end)
     try:
-        ## parse("2015-05-05 2015-05-05") does not throw the ParserError
-        if timespec.count('-')>3:
-            raise dateutil.parser.ParserError("Seems to be two dates here")
+        ## dateparser may misparse strings containing multiple dates; detect early
+        if timespec.count('-') > 3:
+            raise ValueError("Seems to be two dates here")
         ret = parse_dt(timespec)
-        return (ret,None)
-    except dateutil.parser.ParserError:
+        return (ret, None)
+    except ValueError:
         split_by_space = timespec.split(' ')
         if len(split_by_space) == 2:
             return (parse_dt(split_by_space[0]), parse_dt(split_by_space[1]))
