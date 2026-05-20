@@ -7,8 +7,8 @@ and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Added
 
-* Added possibility to add calendar name and calendar url to the template.  Ref https://github.com/tobixen/plann/issues/14 by @rjolina at github.
-* `now` should be an acceptable timestamp.  Ref https://github.com/tobixen/plann/issues/16
+* Added possibility to add calendar name and calendar url to the template.  Ref https://github.com/pycalendar/plann/issues/14 by @rjolina at github.
+* `now` should be an acceptable timestamp.  Ref https://github.com/pycalendar/plann/issues/16
 
 ### Changed
 
@@ -16,7 +16,7 @@ and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Fixed
 
-* `--help` had some wrong information, ref https://github.com/tobixen/plann/issues/16 by Thomas Maeder
+* `--help` had some wrong information, ref https://github.com/pycalendar/plann/issues/16 by Thomas Maeder
 
 ## [v1.0.0] - 2024-12-01
 

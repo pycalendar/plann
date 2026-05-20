@@ -7,4 +7,6 @@ exclude = [
     ".*some\\.davical\\.server.*",
     # External site with expired SSL certificate (not under our control)
     ".*bedework\\.org.*",
+    # xandikos.org returns intermittent 5xx errors (not under our control)
+    ".*xandikos\\.org.*",
 ]
