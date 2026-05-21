@@ -7,23 +7,23 @@ and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Added
 
-* Added possibility to add calendar name and calendar url to the template.  Ref https://github.com/tobixen/plann/issues/14 by @rjolina at github.
-* `now` should be an acceptable timestamp.  Ref https://github.com/tobixen/plann/issues/16
+* Added possibility to add calendar name and calendar url to the template.  Ref https://github.com/pycalendar/plann/issues/14 by @rjolina at github.
+* `now` should be an acceptable timestamp.  Ref https://github.com/pycalendar/plann/issues/16
 
 ### Changed
 
-* Various documentation improvements, some of it by @WhyNotHugo at github in https://github.com/tobixen/plann/pull/15
+* Various documentation improvements, some of it by @WhyNotHugo at github in https://github.com/pycalendar/plann/pull/15
 
 ### Fixed
 
-* `--help` had some wrong information, ref https://github.com/tobixen/plann/issues/16 by Thomas Maeder
+* `--help` had some wrong information, ref https://github.com/pycalendar/plann/issues/16 by Thomas Maeder
 
 ## [v1.0.0] - 2024-12-01
 
 Changelogs up until 1.0 has been dropped, as development was going
 rather fast-paced and erratic, with the priority of getting a tool the
 author can use for his daily planning.  Very little development was
-done in 2024, but the tool works for me.
+done in 2024 and 2025, but the tool works for me.
 
 The 1.0.0-version probably has plenty of rough edges as it hasn't been
 tested much and is lacking some test code, but if nothing else I will

@@ -619,12 +619,12 @@ def _set_task_attribs(ctx):
         return objs
 
     ## Tasks missing categories
-    _set_something_('category', "enter a comma-separated list of CATEGORIES to be added", "https://github.com/tobixen/plann/blob/master/TASK_MANAGEMENT.md#categories-resources-concept-refid")
+    _set_something_('category', "enter a comma-separated list of CATEGORIES to be added", "https://github.com/pycalendar/plann/blob/master/TASK_MANAGEMENT.md#categories-resources-concept-refid")
 
     ## Tasks missing a due date.  Save those objects (workaround for https://gitlab.com/davical-project/davical/-/issues/281)
-    duration_missing = _set_something_('due', "enter the DUE DATE (default +2d)", default="+2d", help_url="https://github.com/tobixen/plann/blob/master/TASK_MANAGEMENT.md#dtstart-due-duration-completion")
+    duration_missing = _set_something_('due', "enter the DUE DATE (default +2d)", default="+2d", help_url="https://github.com/pycalendar/plann/blob/master/TASK_MANAGEMENT.md#dtstart-due-duration-completion")
 
-    _set_something_('priority', 'Enter the PRIORITY', help_url='https://github.com/tobixen/plann/blob/master/TASK_MANAGEMENT.md#priority', default="5")
+    _set_something_('priority', 'Enter the PRIORITY', help_url='https://github.com/pycalendar/plann/blob/master/TASK_MANAGEMENT.md#priority', default="5")
 
     ## Tasks missing a duration
-    _set_something_('duration', """Enter the DURATION (i.e. 5h or 2d)""", help_url="https://github.com/tobixen/plann/blob/master/TASK_MANAGEMENT.md#dtstart-due-duration-completion", objs=duration_missing)
+    _set_something_('duration', """Enter the DURATION (i.e. 5h or 2d)""", help_url="https://github.com/pycalendar/plann/blob/master/TASK_MANAGEMENT.md#dtstart-due-duration-completion", objs=duration_missing)
