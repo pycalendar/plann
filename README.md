@@ -2,7 +2,7 @@
 
 Plann is a command-line CalDAV client, making it possible to add calendar events, browse an agenda and do task management.
 
-This is the "next generation" version of my old [calendar-cli project](https://github.com/tobixen/calendar-cli/).
+This is the "next generation" version of my old [calendar-cli project](https://github.com/pycalendar/calendar-cli/).
 
 Perhaps this work is moot ... or perhaps just 20 years too late.  Considering the recent progress of AI and chatbots, probably soon all calendar queries can be done in natural language.
 
@@ -44,7 +44,7 @@ For development work using Poetry:
 
 ## Support
 
-\#calendar-cli at irc.oftc.net (I'm not available 24/7 there), eventually support@plann.no, eventually the issue tracker at https://github.com/tobixen/plann/issues
+\#calendar-cli at irc.oftc.net (I'm not available 24/7 there), eventually support@plann.no, eventually the issue tracker at https://github.com/pycalendar/plann/issues
 
 Before reaching out, please make sure all the dependencies are installed, and that you've installed the latest version of the caldav python library.  If you're using the master branch of plann, you should also be using the master branch of the caldav python library.
 
@@ -83,7 +83,7 @@ not be up-to-date and may contain features not implemented yet.
 * --nocaldav: don't connect to a caldav server
 * --timezone: any "naive" timestamp should be considered to belong to the given time zone, timestamps outputted should be in this time zone, timestamps given through options should be considered to be in this time zone (Olson database identifiers, like UTC or Europe/Helsinki). (default: local timezone)
 
-The caldav URL should be something like i.e. http://some.davical.server/caldav.php/ - it is only supposed to relay the server location, not the user or calendar.  Things will most likely work if you give http://some.davical.server/caldav.php/tobixen/work-calendar/ - but it will ignore the calendar part of it, and use first calendar it can find - which perhaps may be `tobixen/family-calendar/`.  Use http://some.davical.server/caldav.php/ as the caldav URL, and `/tobixen/family-calendar` as the calendar-url.
+The caldav URL should be something like i.e. http://some.davical.server/caldav.php/ - it is only supposed to relay the server location, not the user or calendar.  Things will most likely work if you give http://some.davical.server/caldav.php/pycalendar/work-calendar/ - but it will ignore the calendar part of it, and use first calendar it can find - which perhaps may be `tobixen/family-calendar/`.  Use http://some.davical.server/caldav.php/ as the caldav URL, and `/pycalendar/family-calendar` as the calendar-url.
 
 ### Commands
 

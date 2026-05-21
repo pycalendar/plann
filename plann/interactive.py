@@ -196,7 +196,7 @@ def _set_relations_from_text_list(calendar, some_list, parent=None, indent=0):
             continue
 
         ## TODO: look through all the conditions above.  should we ever be here?
-        raise NotImplementedError("We should not be here - please raise an issue at https://github.com/tobixen/plann or reach out to bugs@plann.no")
+        raise NotImplementedError("We should not be here - please raise an issue at https://github.com/pycalendar/plann or reach out to bugs@plann.no")
     for c in children:
         c.load()
     _adjust_relations(parent, children)
