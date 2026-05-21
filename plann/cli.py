@@ -398,9 +398,10 @@ def ical(ctx, ical_data, ical_file):
         icals = [ ical ]
     for ical in icals:
         for c in ctx.obj['calendars']:
-            ## TODO: this may not be an event - should make a Calendar.save_object method
-            c.save_event(ical)
-
+            ## TODO: there is a TODO-comment in add_object that objclass should not be mandatory.
+            ## when that one has been fixed, remove this additional logic
+            objclass = caldav.Todo if "BEGIN:VTODO" in ical else (caldav.Journal if "BEGIN:VJOURNAL" in ical else caldav.Event)
+            c.add_object(objclass, ical)
 
 @add.command()
 @click.argument('summary', nargs=-1)

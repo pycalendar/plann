@@ -90,17 +90,10 @@ def __select(ctx, extend_objects=False, all=None, uid=[], abort_on_missing_uid=N
     ## uid(s)
     missing_uids = []
     for uid_ in uid:
-        comp_filter=None
-        if kwargs_['event']:
-            comp_filter='VEVENT'
-        if kwargs_['todo']:
-            comp_filter='VTODO'
-        if kwargs_.get('journal'):
-            comp_filter='VJOURNAL'
         cnt = 0
         for c in ctx.obj['calendars']:
             try:
-                objs.append(c.object_by_uid(uid_, comp_filter=comp_filter))
+                objs.append(c.get_object_by_uid(uid_))
                 cnt += 1
             except caldav.error.NotFoundError:
                 pass
