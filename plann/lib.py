@@ -120,7 +120,7 @@ def find_calendars(args, raise_errors):
     ## TODO: test this more thoroughly.
     ## The code above is supposed to remote the `caldav_`-prefix
     ## Stil the lines below was added to fix
-    ## https://github.com/tobixen/plann/issues/11, credits to @bergercookie
+    ## https://github.com/pycalendar/plann/issues/11, credits to @bergercookie
     if 'caldav_url' in conn_params:
         conn_params['url'] = conn_params.pop('caldav_url')
     if conn_params:
@@ -530,7 +530,7 @@ def _list(objs, ics=False, template="{DTSTART:?{DUE:?(date missing)?}?%F %H:%M:%
             ## This should be a top-level thing
             more_info = {}
             if 'calendar_name' in template.template:
-                more_info['calendar_name'] = obj.parent.name or obj.parent.get_display_name()
+                more_info['calendar_name'] = obj.parent.get_display_name()
             more_info['calendar_url'] = obj.parent.url
             output.append(" "*indent + template.format(**obj.icalendar_component, **more_info))
             ## Recursively add children in an indented way
