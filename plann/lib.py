@@ -471,7 +471,7 @@ def _set_something(obj, arg, value):
 ## TODO: should be rewritten a bit, we should have a create_list method that does not call on click.echo directly
 ## let the caller decide if click is to be used or not.
 ## Use the yield method to avoid having to generate the full list prior to printing to screen
-def _list(objs, ics=False, template="{DTSTART:?{DUE:?(date missing)?}?%F %H:%M:%S %Z}: {SUMMARY:?{DESCRIPTION:?(no summary given)?}?}", top_down=False, bottom_up=False, indent=0, echo=True, uids=None, filter=lambda obj: obj.icalendar_component.get('STATUS', '') not in ('CANCELLED', 'COMPLETED')):
+def _list(objs, ics=False, template="{DTSTART:?{DUE:?(date missing)?}?%F %H:%M:%S %Z}: {SUMMARY:?{DESCRIPTION:?(no summary given)?}?}", top_down=False, bottom_up=False, indent=0, echo=True, uids=None, filter=lambda obj: True):
     """
     Actual implementation of list
 
