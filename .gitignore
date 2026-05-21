@@ -58,3 +58,4 @@ tmp/
 # OS
 .DS_Store
 Thumbs.db
+plann/_version.py

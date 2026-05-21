@@ -16,7 +16,7 @@ help:
 	@echo "  make uninstall                     Uninstall plann"
 	@echo ""
 	@echo "Development:"
-	@echo "  make dev                           Install in development mode (Poetry)"
+	@echo "  make dev                           Install in development mode"
 	@echo "  make test                          Run tests"
 	@echo "  make lint                          Run linter"
 	@echo "  make clean                         Clean build artifacts"
@@ -33,16 +33,20 @@ venv:
 		$(VENV)/bin/pip install --upgrade pip; \
 	fi
 
-# Install package via pip
-# When run as root (sudo make install), installs system-wide with --break-system-packages.
-# When run as a normal user, installs to the user's home directory with --user.
+# Install package: auto-detects root, uv, pipx, or falls back to pip --user
 install:
 	@if [ "$$(id -u)" = "0" ]; then \
 		echo "Installing plann system-wide..."; \
-		pip install --break-system-packages .; \
+		pip install .; \
+	elif command -v uv >/dev/null 2>&1; then \
+		echo "Installing with uv..."; \
+		uv tool install .; \
+	elif command -v pipx >/dev/null 2>&1; then \
+		echo "Installing with pipx..."; \
+		pipx install .; \
 	else \
-		echo "Installing plann for current user..."; \
-		pip install --user .; \
+		echo "Tip: install uv or pipx for isolated installs (pacman -S uv, apt install pipx)"; \
+		PIP_BREAK_SYSTEM_PACKAGES=1 pip install --user .; \
 	fi
 
 # Uninstall plann
@@ -56,17 +60,17 @@ uninstall:
 # Install in development mode
 dev:
 	@echo "Installing in development mode..."
-	@poetry install
+	@PIP_BREAK_SYSTEM_PACKAGES=1 pip install -e ".[dev]"
 	@echo ""
-	@echo "Installed! Run: poetry run plann --help"
+	@echo "Installed! Run: plann --help"
 
 # Run tests
 test:
-	@poetry run pytest tests/ -v
+	@python -m pytest tests/ -v
 
 # Run linter
 lint:
-	@poetry run ruff check .
+	@python -m ruff check .
 
 # Clean build artifacts
 clean:
@@ -84,7 +88,7 @@ install-completion-user:
 	@echo "Installing shell completion for current user..."
 	@mkdir -p "$(COMPLETION_DIR_USER)"
 	@_PLANN_COMPLETE=bash_source plann > "$(COMPLETION_DIR_USER)/plann" 2>/dev/null || \
-		poetry run python -c "import click; from plann.cli import cli; print(click.shell_completion.get_completion_class('bash')(cli, {}, 'plann', '_PLANN_COMPLETE').source())" > "$(COMPLETION_DIR_USER)/plann"
+		python -c "import click; from plann.cli import cli; print(click.shell_completion.get_completion_class('bash')(cli, {}, 'plann', '_PLANN_COMPLETE').source())" > "$(COMPLETION_DIR_USER)/plann"
 	@echo "Completion script installed to $(COMPLETION_DIR_USER)/plann"
 	@echo "Restart your shell or run: source $(COMPLETION_DIR_USER)/plann"
 
