@@ -13,8 +13,9 @@ from unittest.mock import MagicMock, patch
 
 import aiohttp
 import aiohttp.web
+import caldav
 import niquests as requests
-from xandikos.web import XandikosApp, XandikosBackend
+from xandikos.web import SingleUserFilesystemBackend, XandikosApp
 
 from plann.cli import _add_journal, _add_todo, _check_for_panic, _list, _select
 from plann.interactive import (
@@ -24,7 +25,7 @@ from plann.interactive import (
     _mass_reprioritize,
     command_edit,
 )
-from plann.lib import _adjust_ical_relations, _adjust_relations, find_calendars
+from plann.lib import _adjust_ical_relations, _adjust_relations
 from plann.panic_planning import timeline_suggestion
 from tests.test_panic import datetime_
 
@@ -89,7 +90,7 @@ def start_xandikos_server():
     serverdir.__enter__()
     ## Most of the stuff below is cargo-cult-copied from xandikos.web.main
     ## Later jelmer created some API that could be used for this
-    backend = XandikosBackend(path=serverdir.name)
+    backend = SingleUserFilesystemBackend(serverdir.name)
     backend._mark_as_principal("/sometestuser/")
     backend.create_principal("/sometestuser/", create_defaults=True)
     mainapp = XandikosApp(
@@ -132,7 +133,7 @@ def stop_xandikos_server(server_params):
     ## ... but the thread may be stuck waiting for a request ...
     def silly_request():
         try:
-            requests.get(server_params["caldav_url"])
+            requests.get(server_params["caldav_url"]).close()
         except Exception:
             pass
     threading.Thread(target=silly_request).start()
@@ -162,24 +163,37 @@ def passthrough(x):
 def test_plann():
     conn_details = start_xandikos_server()
     try:
-        ctx = MagicMock()
-        ctx.obj = dict()
-        ctx.obj['calendars'] = find_calendars(conn_details, raise_errors=True)
+        with caldav.get_calendars(
+            url=conn_details['caldav_url'],
+            username=conn_details['caldav_user'],
+            password=conn_details['caldav_password'],
+            raise_errors=True,
+        ) as calendars:
+            _run_plann_tests(calendars)
 
-        def dag(obj, reltype, observed=None):
-            if not hasattr(obj, 'get_relatives'):
-                obj = ctx.obj['calendars'][0].object_by_uid(obj)
-            else:
-                obj.load()
-            if not observed:
-                observed = set()
-            ret = {}
-            relatives = obj.get_relatives(reltypes={reltype}, fetch_objects=False)
-            for x in relatives[reltype]:
-                assert x not in observed
-                observed.add(x)
-                ret[x] = dag(x, reltype, observed)
-            return ret
+    finally:
+        stop_xandikos_server(conn_details)
+
+
+def _run_plann_tests(calendars):
+    ctx = MagicMock()
+    ctx.obj = dict()
+    ctx.obj['calendars'] = list(calendars)
+
+    def dag(obj, reltype, observed=None):
+        if not hasattr(obj, 'get_relatives'):
+            obj = ctx.obj['calendars'][0].object_by_uid(obj)
+        else:
+            obj.load()
+        if not observed:
+            observed = set()
+        ret = {}
+        relatives = obj.get_relatives(reltypes={reltype}, fetch_objects=False)
+        for x in relatives[reltype]:
+            assert x not in observed
+            observed.add(x)
+            ret[x] = dag(x, reltype, observed)
+        return ret
 
         ## We create two tasks todo1 and todo2, todo2 being a child of todo1
         todo1 = _add_todo(ctx, summary=['make plann good'], set_due='2012-12-20 23:15:00', set_dtstart='2012-12-20 22:15:00', set_uid='todo1', set_categories='plann,keyboard')
@@ -234,8 +248,8 @@ def test_plann():
 
         ## Test that the calendar_name template attribute works
         list_cal = _list(ctx.obj['objs'], template="{calendar_name}", echo=False)
-        assert list_cal[0] == todo1.parent.name
-        assert list_cal[1] == todo2.parent.name
+        assert list_cal[0] == todo1.parent.get_display_name()
+        assert list_cal[1] == todo2.parent.get_display_name()
 
         ## panic planning, timeline_suggestion.
         ## We have two tasks in the calendar, each with one hour duration
@@ -312,6 +326,9 @@ def test_plann():
         assert len(ctx.obj['objs'])==4
 
         ## Reset ... let's connect todo1 and todo2 again, and remove events
+        ## Reload to get fresh ETags — _check_for_panic modified these objects on the server
+        todo1.load()
+        todo2.load()
         _adjust_relations(todo1, {todo2})
         _adjust_relations(todo2, set())
         todo1.load()
@@ -434,9 +451,6 @@ def test_plann():
         ## TODO: run this for dtend and dtstart on an event as well
         command_edit(todo1, 'set due=2012-12-19 19:15:00', interactive=False)
         assert todo1.icalendar_component['DUE'].dt > todo1.icalendar_component['DTSTART'].dt
-
-    finally:
-        stop_xandikos_server(conn_details)
 
 ## TODO:
 ## Things to be tested: lib._procrastinate, cli._select, cli._cats, cli._list, cli._interactive_edit, cli._set_something, cli._interactive_ical_edit, cli._edit, cli._check_for_panic, _add_todo, _agenda, _check_due,
