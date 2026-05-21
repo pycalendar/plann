@@ -21,6 +21,7 @@ import os
 import sys
 
 import caldav
+import click
 
 from plann.commands import (
     _add_event,
@@ -41,12 +42,7 @@ from plann.config import config_section, expand_config_section, read_config
 from plann.interactive import _abort
 from plann.lib import _list, _split_vcal, _split_vcals, attr_int, attr_time, attr_txt_many, attr_txt_one, find_calendars
 from plann.lib import add_time_tracking as add_time_tracking_
-from plann.metadata import metadata
 from plann.timespec import _now, parse_dt, tz
-
-__version__ = metadata["version"]
-
-import click
 
 list_type = list
 
@@ -65,6 +61,7 @@ list_type = list
 ## /usr/lib/*/site-packages/click/types.py on how to do this.
 
 @click.group()
+@click.version_option(None, "--version", "-V", package_name="plann")
 ## TODO: interactive config building
 ## TODO: language
 @click.option('--show-native-timezone/--show-local-timezone', help="Show timestamps as they are in the calendar (default is to convert to local timezone)")

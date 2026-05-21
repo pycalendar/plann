@@ -1,6 +1,6 @@
 [project]
 name = "plann"
-version = "0.0.0"
+dynamic = ["version"]
 description = "Simple command-line CalDAV client and planning tool, for adding and browsing calendar items, todo list items, etc."
 authors = [{ name = "Tobias Brox", email = "t-plann@tobixen.no" }]
 maintainers = [{ name = "Tobias Brox", email = "t-plann@tobixen.no" }]
@@ -35,35 +35,34 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://plann.no"
-Repository = "https://github.com/tobixen/plann"
+Repository = "https://github.com/pycalendar/plann"
 Documentation = "https://plann.no"
 
 [project.scripts]
 plann = "plann.cli:cli"
 
-[tool.poetry]
-packages = [{include = "plann"}]
-
-[tool.poetry.dependencies]
-python = ">=3.9,<4"
-
-[tool.poetry.group.dev.dependencies]
-niquests = "*"
-pytest = ">=7.0"
-pytest-cov = ">=4.0"
-ruff = ">=0.1.0"
-xandikos = "*"
-deptry = {version = ">=0.24.0", python = ">=3.10"}
-
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-style = "semver"
-pattern = "^v(?P<base>\\d+\\.\\d+\\.\\d+)"
+[project.optional-dependencies]
+dev = [
+    "niquests",
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+    "xandikos",
+    "deptry>=0.24.0",
+]
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
-build-backend = "poetry_dynamic_versioning.backend"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "plann/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["plann"]
 
 [tool.ruff]
 target-version = "py39"
@@ -87,6 +86,7 @@ known-first-party = ["plann"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+filterwarnings = ["error"]
 
 [tool.coverage.run]
 source = ["plann"]
@@ -97,6 +97,9 @@ exclude_lines = [
     "pragma: no cover",
     "if __name__ == .__main__.:",
 ]
+
+[tool.deptry]
+pep621_dev_dependency_groups = ["dev"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["tzlocal"]  # Used indirectly by icalendar/caldav
