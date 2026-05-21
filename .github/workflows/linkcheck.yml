@@ -1,19 +1,54 @@
 name: Link check
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+   - cron: "03 22 * * *"
 
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
     - uses: actions/checkout@v4
+    - name: Restore lychee cache
+      uses: actions/cache@v4
+      with:
+        path: .lycheecache
+        key: cache-lychee-${{ github.run_id }}
+        restore-keys: cache-lychee-
     - name: Check links with Lychee
+      id: lychee
       uses: lycheeverse/lychee-action@v2
       with:
-        fail: true
+        fail: false
         args: >-
           --config .lychee.toml
-          --timeout 10
-          --max-retries 2
-          '**/*.md'
-          '**/*.rst'
+          --timeout 20
+          --max-retries 3
+          --cache
+          --max-cache-age 14d
+          .
+    - name: Create or update Link Checker issue
+      if: steps.lychee.outputs.exit_code != 0
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        EXISTING=$(gh issue list --label "report" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+        if [ -n "$EXISTING" ]; then
+          gh issue edit "$EXISTING" --body-file ./lychee/out.md
+        else
+          gh issue create --title "Link Checker Report" --body-file ./lychee/out.md --label "report"
+        fi
+    - name: Close Link Checker issue if all links are healthy
+      if: steps.lychee.outputs.exit_code == 0
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        EXISTING=$(gh issue list --label "report" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+        if [ -n "$EXISTING" ]; then
+          gh issue close "$EXISTING" --comment "All links are now healthy."
+        fi
