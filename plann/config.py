@@ -163,7 +163,7 @@ def read_config(fn, interactive_error=False):
                 with open(fn, 'rb') as config_file:
                     return yaml.load(config_file, yaml.Loader)
             except yaml.scanner.ScannerError:
-                logging.error("config file exists but is neither valid json nor yaml.  Check the syntax.")
+                logging.error(f"config file {fn!r} exists but is neither valid json nor yaml.  Check the syntax.")
 
     except FileNotFoundError:
         ## File not found
