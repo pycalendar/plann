@@ -3,7 +3,7 @@
 The format of this file is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
 and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.1.0] - 2026-05-28
+## [v1.1.1] - 2026-05-28
 
 ### Added
 
@@ -25,6 +25,10 @@ and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 * `procrastinate 0s` (and other zero-delay variants) was not treated as a no-op due to a typo (`'9s'` instead of `'0s'`).
 * Timezone was incorrectly applied to all-day dates (`datetime.date`), causing off-by-one errors.
 * When selecting by UID, component type (`--event`/`--todo`) no longer needs to be specified, and completed tasks are no longer incorrectly filtered out.
+
+## [v1.1.0] - 2026-05-28
+
+Same as v1.1.1, except the publishing workflow was not working
 
 ## [v1.0.0] - 2024-12-01
 
