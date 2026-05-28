@@ -3,12 +3,16 @@
 The format of this file is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
 and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.1.0] - [unreleased]
+## [v1.1.0] - 2026-05-28
 
 ### Added
 
 * Added possibility to add calendar name and calendar url to the template.  Ref https://github.com/pycalendar/plann/issues/14 by @rjolina at github.
 * `now` should be an acceptable timestamp.  Ref https://github.com/pycalendar/plann/issues/16
+* Natural language timestamps now supported via `dateparser` — "yesterday", "3 hours ago", "Friday", etc. are accepted wherever a timestamp is expected.
+* VJOURNAL support: new `plann add journal` command and `--journal` filter flag on `select`.  Ref https://github.com/tobixen/plann/issues/29
+* Makefile with `install`, `dev`, `test`, `lint`, and `clean` targets, plus shell tab completion install targets.
+* `features` config key is now passed to the caldav library, enabling server-specific compatibility workarounds (e.g. `"features": "davical"`).
 
 ### Changed
 
@@ -17,6 +21,10 @@ and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ### Fixed
 
 * `--help` had some wrong information, ref https://github.com/pycalendar/plann/issues/16 by Thomas Maeder
+* Importing a VCALENDAR file containing multiple events/tasks failed.
+* `procrastinate 0s` (and other zero-delay variants) was not treated as a no-op due to a typo (`'9s'` instead of `'0s'`).
+* Timezone was incorrectly applied to all-day dates (`datetime.date`), causing off-by-one errors.
+* When selecting by UID, component type (`--event`/`--todo`) no longer needs to be specified, and completed tasks are no longer incorrectly filtered out.
 
 ## [v1.0.0] - 2024-12-01
 
