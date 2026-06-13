@@ -47,7 +47,18 @@ class TestParseTimestamp:
         (datetime(2020,2,20),'4d', datetime(2020,2,24)),
         (datetime(2020,2,20),'1w1s', datetime(2020,2,27,0,0,1)),
         (datetime(2020,2,20),'2y1d', datetime(2022,2,21)),
-        (None, '1s', timedelta(seconds=1))
+        (None, '1s', timedelta(seconds=1)),
+        ## Regression tests for the code review bugs #6, #7 and #8.
+        ## #6: the year constant was 1314000 seconds (~15 days), not 31536000.
+        (None, '1y', timedelta(days=365)),
+        ## #8: `diff` was reassigned rather than accumulated, so only the
+        ## last unit of a compound duration survived.
+        (None, '1h30m', timedelta(minutes=90)),
+        (None, '2d3h', timedelta(days=2, hours=3)),
+        ## #7: the year branch used to do datetime arithmetic that blew up on
+        ## a plain date, and on a Feb 29 base date.
+        (date(2021,1,8), '1y', date(2022,1,8)),
+        (date(2020,2,29), '1y', date(2021,2,28)),
          ])
     def test_parseAddDur(self, dt, dur, expected):
          if isinstance(dt, datetime):
@@ -55,6 +66,13 @@ class TestParseTimestamp:
          if isinstance(expected, datetime):
              expected = expected.replace(tzinfo=tz.implicit_timezone)
          assert parse_add_dur(dt, dur) == expected
+
+    @pytest.mark.parametrize("dt", [None, date(2021,1,8)])
+    def test_parseAddDur_fractional_year(self, dt):
+        ## relativedelta only takes whole years - reject rather than
+        ## silently truncating 1.5y to 1y
+        with pytest.raises(ValueError):
+            parse_add_dur(dt, '1.5y')
 
     def _expected_tz(self, dt):
         """
