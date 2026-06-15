@@ -8,13 +8,9 @@ dropped at connect time (code review C8)."""
 import builtins
 
 import pytest
+from caldav.config import extract_conn_params_from_section
 
 from plann.config import interactive_config
-
-try:
-    from caldav.config import extract_conn_params_from_section
-except ImportError:  ## caldav <= 3.2.1 has it as a private function
-    from caldav.config import _extract_conn_params_from_section as extract_conn_params_from_section
 
 
 def _drive(monkeypatch, inputs, secrets=None):
@@ -106,10 +102,9 @@ def test_prompt_keys_are_caldav_connection_parameters():
     """The prompt keys are a hand-written list; check it against caldav's
     reader here rather than with an import-time assert, which would break
     the whole CLI if a caldav release dropped a key."""
-    connkeys = getattr(pytest.importorskip("caldav.config"), "CONNKEYS", None)
-    if connkeys is None:
-        pytest.skip("caldav too old to export CONNKEYS")
+    from caldav.config import CONNKEYS
+
     from plann.config import _CONN_ALIASES, _CONN_PROMPT_KEYS
     for key in _CONN_PROMPT_KEYS:
         bare = key.removeprefix('caldav_')
-        assert _CONN_ALIASES.get(bare, bare) in connkeys, key
+        assert _CONN_ALIASES.get(bare, bare) in CONNKEYS, key
