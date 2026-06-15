@@ -16,11 +16,7 @@ from collections import defaultdict
 import caldav
 import click  ## TODO - this should be removed, eventually
 import icalendar
-
-try:
-    from caldav.config import extract_conn_params_from_section
-except ImportError:  ## caldav <= 3.2.1 has it as a private function
-    from caldav.config import _extract_conn_params_from_section as extract_conn_params_from_section
+from caldav.config import extract_conn_params_from_section
 
 from plann.template import Template
 from plann.timespec import (
