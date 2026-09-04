@@ -13,7 +13,13 @@ fund established by [NLnet](https://nlnet.nl/) with financial support from the
 European Commission's [Next Generation Internet](https://ngi.eu/) programme, under
 the aegis of DG Communications Networks, Content and Technology.
 
-The funded scope is 144 hours.  This was based on an initial
+The funded scope is 144 hours, ten of which are the v1.2.0 release itself
+(item 1.0).  An earlier draft of this document assumed the release would ship
+before the funded period began and be donated to it; that is no longer the plan.
+The release ships first and is charged, and its ten hours come out of Phase 1,
+whose four remaining items are estimated at twenty and funded at ten.
+
+This was based on an initial
 human-made rough plan of five task buckets.  I asked Claude Opus to
 make me a roadmap based on the human-made plan, open issues, existing
 design documents and the code itself.  The buckets have been
@@ -83,14 +89,15 @@ code has never actually delivered.
 
 ---
 
-## Phase 1: Bug fixing and user-facing gaps (20 hours)
+## Phase 1: Release, bug fixing and user-facing gaps (20 hours)
 
-**Baseline:** v1.2.0 ships *before* this funded period begins and is not charged to
-it.  It carries the fifteen correctness bugs from the June 2026 code review, roughly
-twenty other fixes and the config-delegation refactor - everything currently in the
+**Baseline:** v1.2.0 is the first thing this grant delivers, not a gift to it.  It
+carries the fifteen correctness bugs from the June 2026 code review, roughly twenty
+other fixes and the config-delegation refactor - everything currently in the
 `[Unreleased]` section of [`CHANGELOG.md`](../CHANGELOG.md) and in
-[PR #43](https://github.com/pycalendar/plann/pull/43).  Everything below is measured against that
-release, not against the current master.
+[PR #43](https://github.com/pycalendar/plann/pull/43).  Item 1.0 finishes and ships
+it; everything after 1.0 is measured against that release, not against the current
+master.
 
 What remains are the things a user hits and the author does not: two open reports
 against Office 365 through a DavMail gateway, a mass-edit path that is wrong across
@@ -99,13 +106,21 @@ config file.
 
 | Item | Deliverable | h | € | Issue |
 |---|---|---|---|---|
-| 1.1 CalDAV server compatibility | Fixes, or a documented verdict that the fault is `caldav`'s or the server's, with issues filed there | 8 | 400 | [#25](https://github.com/pycalendar/plann/issues/25), [#26](https://github.com/pycalendar/plann/issues/26) |
-| 1.2 Multi-calendar mass-edit | Mass-editing that is correct across calendars, or refuses to run when it cannot be | 4 | 200 | [#48](https://github.com/pycalendar/plann/issues/48) |
-| 1.3 Improving the configuration helper logic | A working `interactive update-config`, a `plann configure` without its "here be dragons" warning, and documented non-plaintext credential options | 4 | 200 | [#49](https://github.com/pycalendar/plann/issues/49) |
-| 1.4 Downstream contributions | Outstanding community contributions merged or answered | 4 | 200 | [PR #46](https://github.com/pycalendar/plann/pull/46) |
+| 1.0 Release v1.2.0 | The `[Unreleased]` work finished, [PR #43](https://github.com/pycalendar/plann/pull/43) landed, changelog closed, released to PyPI | 10 | 500 | |
+| 1.1 CalDAV server compatibility | Fixes, or a documented verdict that the fault is `caldav`'s or the server's, with issues filed there | 8 → **4** | 200 | [#25](https://github.com/pycalendar/plann/issues/25), [#26](https://github.com/pycalendar/plann/issues/26) |
+| 1.2 Multi-calendar mass-edit | Mass-editing that is correct across calendars, or refuses to run when it cannot be | 4 → **3** | 150 | [#48](https://github.com/pycalendar/plann/issues/48) |
+| 1.3 Improving the configuration helper logic | A working `interactive update-config`, a `plann configure` without its "here be dragons" warning, and documented non-plaintext credential options | 4 → **3** | 150 | [#49](https://github.com/pycalendar/plann/issues/49) |
+| 1.4 Downstream contributions | Outstanding community contributions merged or answered | 4 → **0** | 0 | [PR #46](https://github.com/pycalendar/plann/pull/46) |
 
-1.1 carries a dependency the project cannot satisfy on its own: the author has no
-Office 365 account and no DavMail experience, so it needs the original reporter or
+**Items 1.1-1.4 are estimated at 20 hours and funded at 10**, because 1.0 takes the
+other half of the phase.  The arrow column shows the estimate and the allocation.
+The cut falls hardest on 1.4: merging community contributions is not budgeted work
+any more, and will happen as ordinary maintenance or not at all.  1.1, 1.2 and 1.3
+keep their deliverables but lose their slack - if any of them overruns, it comes out
+of Phase 2, not out of the other two.
+
+1.1 also carries a dependency the project cannot satisfy on its own: the author has
+no Office 365 account and no DavMail experience, so it needs the original reporter or
 another affected user.  If that help does not materialise, the hours move to Phase 2.
 
 1.3 is deliberately the *command-line* half only.  Credential storage belongs in the
@@ -224,8 +239,8 @@ duck.
 
 | Release | Contents | After |
 |---|---|---|
-| 1.2.0 | *(baseline - ships before the funded period, not charged to it)* | - |
-| 1.3.0 | Server-compatibility fixes, multi-calendar fixes, usable configuration, community patches | Phase 1 |
+| 1.2.0 | Code-review fixes, the config-delegation refactor, community patches - the baseline everything else is measured against | 1.0 |
+| 1.3.0 | Server-compatibility fixes, multi-calendar fixes, usable configuration | 1.1-1.3 |
 | 2.0.0 | calendaring-client backend | Phase 3 |
 | 2.1.0 | Time tracking in the calendar, `sum_hours` | 4.1, 4.2 |
 | 2.2.0 | Milestone reporting | 4.3 |
@@ -248,7 +263,7 @@ Per-item hours are in the phase tables above.
 
 | Phase | Hours | EUR | Share |
 |---|---|---|---|
-| 1 - Bug fixing and user-facing gaps | 20 | 1000 | 14% |
+| 1 - Release, bug fixing and user-facing gaps | 20 | 1000 | 14% |
 | 2 - Quality assurance | 48 | 2400 | 33% |
 | 3 - Migration to calendaring-client | 16 | 800 | 11% |
 | 4 - Time tracking and milestone reporting | 18 | 900 | 13% |
@@ -263,8 +278,8 @@ EUR was moved to the `calendaring-client` grant to fund the library work that 1.
 
 | Original bucket | Was | Now | Why |
 |---|---|---|---|
-| Bug fixes and downstream improvements | 12 | 20 | Two open user-reported server-compatibility bugs, an unmerged community PR, a multi-calendar data-integrity bug found during this review, and the configuration/credentials path - which is where a new user meets plann and where an advertised command raises `NotImplementedError`.  The v1.2.0 release itself is **not** charged here: it ships before the funded period begins |
-| QA | 48 | 48 | Unchanged in the end, and still the largest bucket by a wide margin: coverage is 50%, there are no type annotations at all, and two of the 88 TODO comments turned out to be unreported bugs.  It was briefly raised to 54 before 600 EUR moved to the sibling grant |
+| Bug fixes and downstream improvements | 12 | 20 | Two open user-reported server-compatibility bugs, an unmerged community PR, a multi-calendar data-integrity bug found during this review, and the configuration/credentials path - which is where a new user meets plann and where an advertised command raises `NotImplementedError`.  The v1.2.0 release is now charged here too, at 10 hours, which is why the four bug-fixing items are funded at 10 against a 20-hour estimate |
+| QA | 48 | 48 | Unchanged in the end, and still the largest bucket by a wide margin: coverage is 50%, there are no type annotations at all, and two of the 88 TODO comments turned out to be unreported bugs.  It was briefly raised to 54 before 300 EUR - six hours - moved to the sibling grant |
 | Migration to calendaring-client | 16 | 16 | Unchanged in size, but moved ahead of the time-tracking work, which now depends on it.  The library-side APIs that plann became a consumer of are funded in the `calendaring-client` grant rather than here.  It buys a partial port and a design critique, not a completed migration |
 | Milestone reporting | 32 | 18 | The iCalendar representation of "time spent" is library work, not plann's.  And the report itself is an export format over an aggregated task list rather than a feature of its own - once the aggregation groups a selection into budget lines and totals each one, the rendering is a template |
 | Documentation | 48 | 42 | Six hours moved to Phase 1.  Documentation is still the second-largest block |
@@ -276,7 +291,7 @@ EUR was moved to the `calendaring-client` grant to fund the library work that 1.
 ### Phase 3 depends on a sibling project that does not exist yet - and now Phase 4 does too
 
 `calendaring-client` currently consists of a README and a roadmap.  No code has
-been written.  Its own funded scope is 216 hours and its CalDAV backend lands at
+been written.  Its own funded scope is 248 hours and its CalDAV backend lands at
 roughly hour 100 of that plan.
 
 This is the largest scheduling risk in this roadmap.  The two projects' estimates
@@ -413,6 +428,8 @@ the first priority will always be to get food on the table.
 | Issue-tracker backends (Gitea, GitLab, GitHub) | 12-20 h each | Cheap only *after* Phase 3; the abstraction is `calendaring-client`'s job | |
 | Alarms and push notifications | 16-24 h | `TASK_MANAGEMENT.md` is ambivalent: "the very nature of plann is to deliver information on demand - pull, not push" | |
 | Completing the calendaring-client migration | 16-24 h | Phase 3 buys a partial port; this buys the rest | |
+| Downstream contributions (was item 1.4) | 4 h | Merging and answering outstanding community contributions.  Funded at 4 hours until the v1.2.0 release was charged to Phase 1; now unfunded, and left to ordinary maintenance | [PR #46](https://github.com/pycalendar/plann/pull/46) |
+| The slack that Phase 1 lost | 6 h | 1.1, 1.2 and 1.3 are funded at 10 hours against a 20-hour estimate.  If they come in at estimate rather than at budget, this is what it costs | |
 
 ---
 
