@@ -39,6 +39,10 @@ hours are distributed the way they are, what depends on what, what gets released
 when, and what is deliberately *not* funded.  Where this document and an issue
 disagree on a detail, the issue wins.
 
+Every item has a status: `[x]` done, `[ ] wip` partly done (the text around the
+table says what is left), `[ ]` not started.  The hours are the estimates as made
+on 2026-08-26; they have not been re-estimated as work proceeds.
+
 ---
 
 ## Overview
@@ -51,7 +55,7 @@ December 2024.
 The tool works, and the author uses it daily.  What it is not, yet, is a project
 other people can pick up without reading the source: the test suite covers 50% of
 the code (22% of `commands.py`, the module that holds most of the logic), the
-package carries no type annotations at all, several advertised commands raise
+package carries no type annotations at all, an advertised command still raises
 `NotImplementedError`, and the user guide predates the 1.0 release and says so in
 its own first paragraph.
 
@@ -104,13 +108,13 @@ against Office 365 through a DavMail gateway, a mass-edit path that is wrong acr
 calendars, and a configuration story that only works if you already have a working
 config file.
 
-| Item | Deliverable | h | € | Issue |
-|---|---|---|---|---|
-| 1.0 Release v1.2.0 | The `[Unreleased]` work finished, [PR #43](https://github.com/pycalendar/plann/pull/43) landed, changelog closed, released to PyPI | 10 | 500 | |
-| 1.1 CalDAV server compatibility | Fixes, or a documented verdict that the fault is `caldav`'s or the server's, with issues filed there | 8 → **4** | 200 | [#25](https://github.com/pycalendar/plann/issues/25), [#26](https://github.com/pycalendar/plann/issues/26) |
-| 1.2 Multi-calendar mass-edit | Mass-editing that is correct across calendars, or refuses to run when it cannot be | 4 → **3** | 150 | [#48](https://github.com/pycalendar/plann/issues/48) |
-| 1.3 Improving the configuration helper logic | A working `interactive update-config`, a `plann configure` without its "here be dragons" warning, and documented non-plaintext credential options | 4 → **3** | 150 | [#49](https://github.com/pycalendar/plann/issues/49) |
-| 1.4 Downstream contributions | Outstanding community contributions merged or answered | 4 → **0** | 0 | [PR #46](https://github.com/pycalendar/plann/pull/46) |
+| Status | Item | Deliverable | h | € | Issue |
+|---|---|---|---|---|---|
+| [ ] wip | 1.0 Release v1.2.0 | The `[Unreleased]` work finished, [PR #43](https://github.com/pycalendar/plann/pull/43) landed, changelog closed, released to PyPI | 10 | 500 | |
+| [ ] | 1.1 CalDAV server compatibility | Fixes, or a documented verdict that the fault is `caldav`'s or the server's, with issues filed there | 8 → **4** | 200 | [#25](https://github.com/pycalendar/plann/issues/25), [#26](https://github.com/pycalendar/plann/issues/26) |
+| [ ] | 1.2 Multi-calendar mass-edit | Mass-editing that is correct across calendars, or refuses to run when it cannot be | 4 → **3** | 150 | [#48](https://github.com/pycalendar/plann/issues/48) |
+| [ ] wip | 1.3 Improving the configuration helper logic | `interactive update-config` resolved one way or the other (it was dropped in v1.2.0 rather than implemented), a `plann configure` without its "here be dragons" warning, and documented non-plaintext credential options | 4 → **3** | 150 | [#49](https://github.com/pycalendar/plann/issues/49) |
+| [x] | 1.4 Downstream contributions | Outstanding community contributions merged or answered | 4 → **0** | 0 | [PR #46](https://github.com/pycalendar/plann/pull/46) |
 
 **Items 1.1-1.4 are estimated at 20 hours and funded at 10**, because 1.0 takes the
 other half of the phase.  The arrow column shows the estimate and the allocation.
@@ -118,6 +122,19 @@ The cut falls hardest on 1.4: merging community contributions is not budgeted wo
 any more, and will happen as ordinary maintenance or not at all.  1.1, 1.2 and 1.3
 keep their deliverables but lose their slack - if any of them overruns, it comes out
 of Phase 2, not out of the other two.
+
+**Status:** 1.0 is all but done - PR #43 is merged, the orphaned-`RECURRENCE-ID`
+warning and the removal of the dead `interactive update-config` landed on top of it,
+and the changelog is closed as v1.2.0 - but the tag and the PyPI upload are still
+outstanding, so the item stays open until users can install it.  1.3 has its
+credential half: connection settings in the config file now expand `${VAR}` and
+`${VAR:-default}`, documented in the README, which is also what closed 1.4 (see
+[PR #46](https://github.com/pycalendar/plann/pull/46), answered and closed on the
+grounds that configuration belongs in the caldav library and that environment
+variables cover the reporter's need).  What is left of 1.3 is `plann configure`
+itself: it is still `EXPERIMENTAL` and still prints "here be dragons", and the
+rewrite of `interactive update-config` turned into a deletion, which resolves the
+deliverable but does not deliver a working interactive config editor.
 
 1.1 also carries a dependency the project cannot satisfy on its own: the author has
 no Office 365 account and no DavMail experience, so it needs the original reporter or
@@ -147,13 +164,13 @@ Beyond coverage: **zero** type annotations across 139 function definitions, and
 **88** `TODO`/`FIXME` comments, two of which turned out to be unreported bugs when
 read during this review.
 
-| Item | Deliverable | h | € | Issue |
-|---|---|---|---|---|
-| 2.1 Coverage for `commands.py` / `interactive.py` | Both modules at or above 70%, with a CI coverage floor so it cannot drift back | 16 | 800 | [#50](https://github.com/pycalendar/plann/issues/50) |
-| 2.2 End-to-end command-line tests | An executable suite exercising the documented command lines against a real server | 10 | 500 | [#13](https://github.com/pycalendar/plann/issues/13) |
-| 2.3 Type annotations and static checking | Annotated public functions, mypy running clean in CI | 12 | 600 | [#51](https://github.com/pycalendar/plann/issues/51) |
-| 2.4 TODO triage | TODO count reduced to genuinely local notes; everything else an issue or deleted | 6 | 300 | [#52](https://github.com/pycalendar/plann/issues/52) |
-| 2.5 Remaining code-review debt | The last open item (`C9`) from the June 2026 review closed | 4 | 200 | [#53](https://github.com/pycalendar/plann/issues/53) |
+| Status | Item | Deliverable | h | € | Issue |
+|---|---|---|---|---|---|
+| [ ] | 2.1 Coverage for `commands.py` / `interactive.py` | Both modules at or above 70%, with a CI coverage floor so it cannot drift back | 16 | 800 | [#50](https://github.com/pycalendar/plann/issues/50) |
+| [ ] | 2.2 End-to-end command-line tests | An executable suite exercising the documented command lines against a real server | 10 | 500 | [#13](https://github.com/pycalendar/plann/issues/13) |
+| [ ] | 2.3 Type annotations and static checking | Annotated public functions, mypy running clean in CI | 12 | 600 | [#51](https://github.com/pycalendar/plann/issues/51) |
+| [ ] | 2.4 TODO triage | TODO count reduced to genuinely local notes; everything else an issue or deleted | 6 | 300 | [#52](https://github.com/pycalendar/plann/issues/52) |
+| [ ] | 2.5 Remaining code-review debt | The last open item (`C9`) from the June 2026 review closed | 4 | 200 | [#53](https://github.com/pycalendar/plann/issues/53) |
 
 2.2 is also what keeps Phase 5 honest: a user guide whose examples run in CI cannot
 rot.  2.5 blocks Phase 4 - per-calendar configuration that vanishes depending on how
@@ -180,9 +197,9 @@ library work is funded where it will be written.
 **These 16 hours do not buy a completed migration.**  `calendaring-client`'s roadmap
 estimates the full port at 24-40 hours and places it outside its own funded scope.
 
-| Item | Deliverable | h | € | Issue |
-|---|---|---|---|---|
-| 3.1 Port plann onto calendaring-client | A meaningful subset running on the new library, one non-trivial command proven against a non-CalDAV backend, and a written API critique delivered before its 1.0 freeze | 16 | 800 | [#55](https://github.com/pycalendar/plann/issues/55) |
+| Status | Item | Deliverable | h | € | Issue |
+|---|---|---|---|---|---|
+| [ ] | 3.1 Port plann onto calendaring-client | A meaningful subset running on the new library, one non-trivial command proven against a non-CalDAV backend, and a written API critique delivered before its 1.0 freeze | 16 | 800 | [#55](https://github.com/pycalendar/plann/issues/55) |
 
 ---
 
@@ -200,11 +217,11 @@ iCalendar representation of "time spent" is library work (Phase 3), and the mile
 report is an export format over an aggregated task list rather than a feature of its
 own.
 
-| Item | Deliverable | h | € | Issue |
-|---|---|---|---|---|
-| 4.1 Time tracking on the command line | `complete --spent/--log/--start/--end`, writing through the library's time-tracking API | 6 | 300 | [#54](https://github.com/pycalendar/plann/issues/54) |
-| 4.2 `sum_hours` and aggregation | A working `sum_hours` that groups a selection into budget lines and produces per-line subtotals, keeping committed and spent time separate | 8 | 400 | [#56](https://github.com/pycalendar/plann/issues/56) |
-| 4.3 Milestone reporting | An NLnet-format hours/budget export, and a generic invoice-style one, over 4.2's output | 4 | 200 | [#61](https://github.com/pycalendar/plann/issues/61) |
+| Status | Item | Deliverable | h | € | Issue |
+|---|---|---|---|---|---|
+| [ ] | 4.1 Time tracking on the command line | `complete --spent/--log/--start/--end`, writing through the library's time-tracking API | 6 | 300 | [#54](https://github.com/pycalendar/plann/issues/54) |
+| [ ] | 4.2 `sum_hours` and aggregation | A working `sum_hours` that groups a selection into budget lines and produces per-line subtotals, keeping committed and spent time separate | 8 | 400 | [#56](https://github.com/pycalendar/plann/issues/56) |
+| [ ] | 4.3 Milestone reporting | An NLnet-format hours/budget export, and a generic invoice-style one, over 4.2's output | 4 | 200 | [#61](https://github.com/pycalendar/plann/issues/61) |
 
 ---
 
@@ -219,13 +236,13 @@ and that document opens "This document is dedicated to my rubber ducky".  There 
 Sphinx skeleton in `docs/source/` that builds nothing, and `plann.no` is advertised in
 `pyproject.toml` as both homepage and documentation.
 
-| Item | Deliverable | h | € | Issue |
-|---|---|---|---|---|
-| 5.1 Structure and a published site | A built documentation site, published and built in CI | 12 | 600 | [#57](https://github.com/pycalendar/plann/issues/57) |
-| 5.2 Rewrite the user guide | A user guide whose every example is executed in CI | 14 | 700 | [#58](https://github.com/pycalendar/plann/issues/58) |
-| 5.3 Task-management method and panic algorithm | The panic-planning algorithm documented for users, and `TASK_MANAGEMENT.md` completed | 8 | 400 | [#59](https://github.com/pycalendar/plann/issues/59) |
-| 5.4 Link rot and hygiene | A clean link check, re-run after 5.1 moves files around | 2 | 100 | [#47](https://github.com/pycalendar/plann/issues/47) |
-| 5.5 Peer review (reviewers wanted) | Revisions from at least two reviewers who are not the author | 6 | 300 | [#60](https://github.com/pycalendar/plann/issues/60) |
+| Status | Item | Deliverable | h | € | Issue |
+|---|---|---|---|---|---|
+| [ ] | 5.1 Structure and a published site | A built documentation site, published and built in CI | 12 | 600 | [#57](https://github.com/pycalendar/plann/issues/57) |
+| [ ] | 5.2 Rewrite the user guide | A user guide whose every example is executed in CI | 14 | 700 | [#58](https://github.com/pycalendar/plann/issues/58) |
+| [ ] | 5.3 Task-management method and panic algorithm | The panic-planning algorithm documented for users, and `TASK_MANAGEMENT.md` completed | 8 | 400 | [#59](https://github.com/pycalendar/plann/issues/59) |
+| [ ] | 5.4 Link rot and hygiene | A clean link check, re-run after 5.1 moves files around | 2 | 100 | [#47](https://github.com/pycalendar/plann/issues/47) |
+| [ ] | 5.5 Peer review (reviewers wanted) | Revisions from at least two reviewers who are not the author | 6 | 300 | [#60](https://github.com/pycalendar/plann/issues/60) |
 
 5.3 matters more than its size suggests: panic planning is plann's most distinctive
 feature and its least explicable one.  `TASK_MANAGEMENT.md` ends on "TODO: write more
