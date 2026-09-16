@@ -65,7 +65,7 @@ code has never actually delivered.
 
 1. **Correctness before surface area.** The 2026-06 code review found fifteen
    correctness bugs, several of which made whole subcommands unreachable.  They are
-   fixed, and ship in v1.2.0 before this funded period begins.  What the review also
+   fixed, and ship in v1.2.0, the first release of this funded period.  What the review also
    showed is *why* they survived so long: the code they lived in had almost no
    tests.  Fixing the bugs without fixing that leaves the next fifteen in place.
 2. **plann is a CLI, not a library.** [`DESIGN.md`](../DESIGN.md) states that plann

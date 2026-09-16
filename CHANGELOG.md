@@ -1,60 +1,64 @@
 # Changelog
 
-The format of this file is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
+The format of this file is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## v1.2.0 - 2026-09-16
 
 ### Added
 
-* `edit --add-categories`, `--add-resource` and `--add-resources` options (alongside the existing `--add-category`).  A single value containing commas is split by the plural forms (`--add-categories`/`--add-resources`) and kept literal by the singular forms (`--add-category`/`--add-resource`).
-* `select ... list --separator=...` to join the listed items with something other than a newline.  (Ported from the archived development branch.)
-* The interactive edit prompt now advertises the `start` command (kicks off time tracking for the task) and re-prompts afterwards so a follow-up command can be given for the same task.  (Ported from the archived development branch.)
-* `add ical` warns when the imported data holds RECURRENCE-ID overrides with no master event for the same UID - typically left behind when the recurring event was deleted elsewhere.  The overrides are still imported, as detached occurrences.
-* `select --warn-on-missing-uid/--no-warn-on-missing-uid` (default: warn).  A `--uid` that matches nothing in any calendar now prints a warning naming the missing uid(s) to stderr, rather than being silently ignored.  `--abort-on-missing-uid` still takes precedence, and `--no-warn-on-missing-uid` restores the old fully-silent behaviour.  Ref https://github.com/tobixen/plann/issues/42
-* `plann configure`: an interactive configuration mode (EXPERIMENTAL/under-tested) that prompts for connection parameters and writes them to the config file.  The underlying code existed but had been orphaned in the argparse→click migration; it is now wired up again, and the prompted keys match what the caldav library actually reads (so e.g. `ssl_verify_cert` is no longer written under a key that is silently ignored at connect time).
+* `edit --add-categories`, `--add-resource` and `--add-resources` options (alongside the existing `--add-category`).  A single value containing commas is split by the plural forms and kept literal by the singular forms.
+* `select ... list --separator=...` to join the listed items with something other than a newline.
+* The interactive edit prompt now offers the `start` command (starts time tracking for the task) and asks again afterwards, so a follow-up command can be given for the same task.
+* `plann configure`: an interactive configuration mode (EXPERIMENTAL, under-tested) that prompts for connection parameters and writes them to the config file - a new section, or an existing one with its current values offered as defaults.
+* Environment variable references - `${VAR}` or `${VAR:-default}` - in the connection settings of a config section (`caldav_url`, `caldav_user`, `caldav_pass`, `caldav_proxy`, ...) are now expanded, so e.g. the password can be kept out of the config file.  See the configuration section of the README.
+* `add ical` warns when the imported data holds RECURRENCE-ID overrides with no master event for the same UID - typically left behind when the recurring event was deleted elsewhere, or exported one instance at a time.  They are still imported: merged into the series when the server has the master, stored as detached occurrences otherwise.
+
+### Changed
+
+* `select --uid` now prints a warning to stderr naming uids that match nothing in any calendar, instead of ignoring them silently.  `--no-warn-on-missing-uid` restores the silent behaviour; `--abort-on-missing-uid` still takes precedence.  Ref https://github.com/pycalendar/plann/issues/42
+* `edit --set-resources` now splits its value on comma, the same way `--set-categories` always has: `--set-resources a,b` sets two resources rather than one named `a,b`.
+* Config file parsing, connection parameter extraction and calendar lookup are now done by the caldav library instead of plann's own copy of that code, and a `features` key is resolved through the caldav library's server profiles.
+* Fewer server round-trips: a hierarchical `list --top-down`/`--bottom-up` fetches each related task only once, and `interactive set-task-attribs` fetches the task list once instead of querying per attribute.
+* Dependencies: caldav 3.3.0 or newer is now required (was 1.5.0), `python-dateutil` and `icalendar_searcher` are new dependencies, and `tzlocal` is no longer needed.  The package metadata now declares the license as GPL-3.0-or-later.
+
+### Deprecated
+
+* `edit --set-category`: it *appends* rather than replaces, which the name does not convey.  Use `--add-category` to append or `--set-categories` to replace.
+
+### Removed
+
+* `interactive update-config`, which was never implemented and only raised an error.  Use `plann configure`.
 
 ### Fixed
 
-* `add ical` with several concatenated VCALENDAR objects no longer silently ignores them all when the data uses CRLF line endings (the RFC 5545 canonical form): the split is now done by the icalendar library instead of a hand-rolled LF-only string scan.
-* Showing help for a subcommand (e.g. `plann select --help`) no longer connects to every configured calendar; calendar discovery is deferred until a command actually needs it.
-* A config section carrying `features` but no `caldav_url` crashed with `KeyError: 'url'`.  The caldav library resolves the URL from the server profile given in `features`, so no URL is needed.
-* The time tracking integration (`"extra_config": {"time_tracking": ["timewarrior"]}` in a config section) did not work: the configuration was attached to the calendar objects under a different attribute name than the time tracking code read, and only the value `timew` was accepted - not `timewarrior` as the error message suggested.  (Fixes ported from the archived development branch.)
-* Exporting an event/task to timewarrior no longer removes the categories from the object.
-* `select ... delete` now reports what it did: it names each item as it is deleted, and says "No items selected for deletion" on an empty selection instead of silently producing no output regardless of whether anything matched.  Ref https://github.com/tobixen/plann/issues/42
-* `select ... add-time-tracking` could not be run at all - it aborted with an "Invalid start character for option" error before doing anything.
-* Durations were computed wrongly in several ways: `1y` came out as roughly 15 days rather than a year, and a compound duration such as `1h30m` kept only its last component (30 minutes).  Adding a year to a plain date, or to February 29, raised an error.
+* Time tracking through timewarrior did not work at all: the `time_tracking` setting in a config section was never picked up, only the value `timew` was accepted (not `timewarrior`, as the error message suggested), and `select ... add-time-tracking` aborted with "Invalid start character for option" before doing anything.
+* `add ical` with several concatenated VCALENDAR objects imported nothing when the data used CRLF line endings (the RFC 5545 canonical form).
+* Showing help for a subcommand (e.g. `plann select --help`) no longer connects to every configured calendar.
+* A config section with `features` but no `caldav_url` crashed with `KeyError: 'url'`; the URL is now taken from the server profile.
+* `select ... delete` now names each item as it is deleted, and says "No items selected for deletion" on an empty selection, instead of printing nothing either way.  Ref https://github.com/pycalendar/plann/issues/42
+* Durations were computed wrongly: `1y` came out as roughly 15 days, and a compound duration such as `1h30m` kept only its last component.  Adding a year to a plain date, or to February 29, raised an error.  A fractional number of years (`1.5y`) is now rejected instead of being miscalculated.
 * `interactive check-due --limit N` crashed instead of limiting the number of tasks shown.
 * `select --no-pinned-tasks` crashed when tasks were included in the selection.
-* `interactive split` did not postpone the task when asked to - the prompt was inverted, so answering with a duration did nothing and declining postponed it.
+* Splitting a task interactively (the `split` edit command, `interactive split-huge-tasks`, `interactive split-high-pri-tasks`) never postponed the task: the postpone prompt was inverted, so a duration was ignored and only the `0h` default reached the postpone code, where it did nothing.
 * `postpone <duration> with parent` in interactive editing silently did nothing.
 * The relationship overview showed only the first kind of relation, so e.g. children were listed but parents were not.
 * Panic planning (`check-for-panic`, `dismiss-panic`) no longer crashes on all-day events that have relations.
 * Adding a category to an object with more than one `CATEGORIES` line crashed.
 * Reporting an inconsistent relationship crashed instead of logging what was wrong.
-* A `time_tracking` setting written as a plain string rather than a list was read one character at a time.
-* Postponing a task with parents could drop the user into the Python debugger.
-* `edit` now reports clearly that no editor could be found, rather than failing in a confusing way further down.
+* Postponing a task with a long chain of parents could drop the user into the Python debugger.
+* An object whose summary or description contained text like `BEGIN:VEVENT` could be taken for the wrong kind of object - e.g. a task refused by interactive editing as if it were an event.
+* Commands that open a text editor (`select --mass-interactive`, `edit --interactive-ical`, `edit --interactive-relations`, ...) now say clearly that no editor could be found, instead of failing confusingly further down.
+* `interactive set-task-attribs` could miss tasks lacking an attribute on calendar servers that do not filter searches properly.
 
-### Changed
-
-* Dependencies: caldav 3.3.0 or newer is now required (was 1.5.0), `python-dateutil` and `icalendar_searcher` are new dependencies, and `tzlocal` is no longer needed.  The package metadata now declares the license as GPL-3.0-or-later.
-* `edit --set-resources` now splits its value on comma, the same way `--set-categories` always has; `--set-resources a,b` now sets two resources rather than one resource literally named `a,b`.
-* `edit --set-category` is now flagged as deprecated in its `--help`: it *appends* rather than replaces (the name does not convey this).  Use `--add-category` to append or `--set-categories` to replace.
-* (internal) The `category`/`categories` (and now `resources`) handling on the edit path is driven by a single `COMMA_LIST_ATTRS` registry rather than being special-cased in several places.
-* (internal) A template sort key (`--sort-key`) is now compiled once per key instead of being rebuilt on every comparison while sorting.
-* (internal) A hierarchical `list --top-down`/`--bottom-up` now caches related tasks for the duration of the traversal instead of re-fetching the same task from the server once per relationship edge.
-* (internal) `set-task-attribs` now fetches the task list once and filters client-side per attribute (via the `icalendar_searcher` library) instead of issuing a separate server query for each of category/due/priority/duration.  As a side effect, on calendar servers that do not filter properly it now finds tasks missing an attribute that it previously could miss.
-* Config file parsing, connection parameter extraction and calendar lookup are now delegated to the caldav library instead of being duplicated in plann.  (The caldav library adopted this code from plann a while back; plann was still carrying its own copy.)  Visible side effects: environment variable references like `${SOME_VAR}` or `${SOME_VAR:-default}` in config values are now expanded, and a `features` key is resolved through the caldav library's profile lookup.
-
-## [v1.1.1] - 2026-05-28
+## v1.1.1 - 2026-05-28
 
 ### Added
 
 * Added possibility to add calendar name and calendar url to the template.  Ref https://github.com/pycalendar/plann/issues/14 by @rjolina at github.
 * `now` should be an acceptable timestamp.  Ref https://github.com/pycalendar/plann/issues/16
 * Natural language timestamps now supported via `dateparser` — "yesterday", "3 hours ago", "Friday", etc. are accepted wherever a timestamp is expected.
-* VJOURNAL support: new `plann add journal` command and `--journal` filter flag on `select`.  Ref https://github.com/tobixen/plann/issues/29
+* VJOURNAL support: new `plann add journal` command and `--journal` filter flag on `select`.  Ref https://github.com/pycalendar/plann/issues/29
 * Makefile with `install`, `dev`, `test`, `lint`, and `clean` targets, plus shell tab completion install targets.
 * `features` config key is now passed to the caldav library, enabling server-specific compatibility workarounds (e.g. `"features": "davical"`).
 
@@ -70,11 +74,11 @@ and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 * Timezone was incorrectly applied to all-day dates (`datetime.date`), causing off-by-one errors.
 * When selecting by UID, component type (`--event`/`--todo`) no longer needs to be specified, and completed tasks are no longer incorrectly filtered out.
 
-## [v1.1.0] - 2026-05-28
+## v1.1.0 - 2026-05-28
 
 Same as v1.1.1, except the publishing workflow was not working
 
-## [v1.0.0] - 2024-12-01
+## v1.0.0 - 2024-12-01
 
 Changelogs up until 1.0 has been dropped, as development was going
 rather fast-paced and erratic, with the priority of getting a tool the
