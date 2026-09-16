@@ -634,14 +634,6 @@ def dismiss_panic(ctx, hours_per_day, lookahead='60d'):
 
 
 @interactive.command()
-@click.pass_context
-def update_config(ctx):
-    """
-    Edit the config file interactively
-    """
-    raise NotImplementedError()
-
-@interactive.command()
 @click.option('--threshold', help='tasks with a higher estimate than this should be split into subtasks', default='4h')
 @click.option('--max-lookahead', help='ignore tasks further in the future than this', default='30d')
 @click.option('--limit-lookahead', help='only consider the first x tasks', default=32)
