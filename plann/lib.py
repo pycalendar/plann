@@ -138,6 +138,16 @@ def _split_vcal(ical):
                 for tz in ical_cal_stripped.subcomponents:
                     split_by_uid[uid].add_component(tz)
             split_by_uid[uid].add_component(subcomponent)
+    for uid, vcal in split_by_uid.items():
+        components = [x for x in vcal.subcomponents if not isinstance(x, icalendar.Timezone)]
+        has_master = any('RECURRENCE-ID' not in x for x in components)
+        has_exception = any('RECURRENCE-ID' in x for x in components)
+        if has_exception and not has_master:
+            logging.warning(
+                "UID %s has RECURRENCE-ID override(s) but no master event in this calendar: %s. "
+                "The master may have been deleted. Will import as detached occurrence(s).",
+                uid, [str(x.get('SUMMARY', '(no summary)')) for x in components])
+
     ## Return ical strings, like _split_vcals does - the callers hand the
     ## result on to _caldav_objclass()/add_object(), which parse text.
     return [cal.to_ical().decode() for cal in split_by_uid.values()]

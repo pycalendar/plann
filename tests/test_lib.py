@@ -403,6 +403,26 @@ END:VCALENDAR
     assert(len(output) == 2)
 
 
+def test_split_vcal_warns_on_orphaned_recurrence_id(caplog):
+    """A UID group holding only RECURRENCE-ID overrides has lost its master
+    event - typically deleted by the originating calendar application without
+    cleaning up the overrides.  Import it, but say so."""
+    orphan = todo.replace(
+        'UID:19970901T130000Z-123404@host.com',
+        'UID:19970901T130000Z-123404@host.com\nRECURRENCE-ID:19970415T133000Z')
+    with caplog.at_level('WARNING'):
+        parts = _split_vcal(orphan)
+    assert len(parts) == 1
+    assert 'RECURRENCE-ID' in caplog.text
+    assert '19970901T130000Z-123404@host.com' in caplog.text
+
+    ## a normal object must not warn
+    caplog.clear()
+    with caplog.at_level('WARNING'):
+        _split_vcal(todo)
+    assert caplog.text == ''
+
+
 def test_split_vcal_yields_ical_strings():
     """`add ical` feeds every element of _split_vcal() straight into
     _caldav_objclass(), which parses text - so _split_vcal must yield ical
