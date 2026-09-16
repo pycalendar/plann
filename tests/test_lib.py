@@ -403,23 +403,40 @@ END:VCALENDAR
     assert(len(output) == 2)
 
 
-def test_split_vcal_warns_on_orphaned_recurrence_id(caplog):
+def test_warn_orphaned_recurrence_id(caplog):
     """A UID group holding only RECURRENCE-ID overrides has lost its master
     event - typically deleted by the originating calendar application without
-    cleaning up the overrides.  Import it, but say so."""
+    cleaning up the overrides.  `add ical` imports it, but says so."""
+    from plann.lib import _warn_orphaned_overrides
     orphan = todo.replace(
         'UID:19970901T130000Z-123404@host.com',
-        'UID:19970901T130000Z-123404@host.com\nRECURRENCE-ID:19970415T133000Z')
+        'UID:orphan-uid@host.com\nRECURRENCE-ID:19970415T133000Z')
     with caplog.at_level('WARNING'):
-        parts = _split_vcal(orphan)
-    assert len(parts) == 1
-    assert 'RECURRENCE-ID' in caplog.text
-    assert '19970901T130000Z-123404@host.com' in caplog.text
+        _warn_orphaned_overrides(orphan)
+    assert 'orphan-uid@host.com' in caplog.text
+
+    ## several concatenated VCALENDARs are checked one by one
+    caplog.clear()
+    with caplog.at_level('WARNING'):
+        _warn_orphaned_overrides(todo + '\n' + orphan)
+    assert 'orphan-uid@host.com' in caplog.text
+    assert '19970901T130000Z-123404@host.com' not in caplog.text
 
     ## a normal object must not warn
     caplog.clear()
     with caplog.at_level('WARNING'):
-        _split_vcal(todo)
+        _warn_orphaned_overrides(todo)
+    assert caplog.text == ''
+
+
+def test_split_vcal_does_not_warn(caplog):
+    """The warning belongs to the import path only - `edit --interactive-ical`
+    splits the very same data and imports nothing."""
+    orphan = todo.replace(
+        'UID:19970901T130000Z-123404@host.com',
+        'UID:orphan-uid@host.com\nRECURRENCE-ID:19970415T133000Z')
+    with caplog.at_level('WARNING'):
+        _split_vcal(orphan)
     assert caplog.text == ''
 
 

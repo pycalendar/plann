@@ -138,15 +138,6 @@ def _split_vcal(ical):
                 for tz in ical_cal_stripped.subcomponents:
                     split_by_uid[uid].add_component(tz)
             split_by_uid[uid].add_component(subcomponent)
-    for uid, vcal in split_by_uid.items():
-        components = [x for x in vcal.subcomponents if not isinstance(x, icalendar.Timezone)]
-        has_master = any('RECURRENCE-ID' not in x for x in components)
-        has_exception = any('RECURRENCE-ID' in x for x in components)
-        if has_exception and not has_master:
-            logging.warning(
-                "UID %s has RECURRENCE-ID override(s) but no master event in this calendar: %s. "
-                "The master may have been deleted. Will import as detached occurrence(s).",
-                uid, [str(x.get('SUMMARY', '(no summary)')) for x in components])
 
     ## Return ical strings, like _split_vcals does - the callers hand the
     ## result on to _caldav_objclass()/add_object(), which parse text.
@@ -161,6 +152,28 @@ def _split_vcals(ical):
     and line folding) rather than scanning the raw string by hand.
     """
     return [cal.to_ical().decode() for cal in icalendar.Calendar.from_ical(ical, multiple=True)]
+
+def _warn_orphaned_overrides(ical):
+    """Warn about UIDs in the ical data that hold only RECURRENCE-ID overrides
+    and no master event - typically left behind when the recurring event was
+    deleted without cleaning up its overrides - or simply what you get when
+    one instance of a series is exported on its own.  Meant for the import
+    path (`add ical`); a UID is judged across the whole data, so a master in
+    one VCALENDAR covers an override in another.  What the server ends up
+    with is caldav's call: it merges an override into the master when the
+    server has one."""
+    by_uid = {}
+    for cal in icalendar.Calendar.from_ical(ical, multiple=True):
+        for comp in cal.subcomponents:
+            if not isinstance(comp, icalendar.Timezone):
+                by_uid.setdefault(comp.get('UID'), []).append(comp)
+    for uid, components in by_uid.items():
+        if all('RECURRENCE-ID' in x for x in components):
+            logging.warning(
+                "UID %s holds RECURRENCE-ID override(s) and no master event: %s. "
+                "The caldav library merges them into the series if the server has the "
+                "master, otherwise they are stored as detached occurrence(s).",
+                uid, [str(x.get('SUMMARY', '(no summary)')) for x in components])
 
 def find_calendars(args, raise_errors):
     """
