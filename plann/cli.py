@@ -47,6 +47,7 @@ from plann.lib import (
     _split_vcal,
     _split_vcals,
     _summary,
+    _warn_orphaned_overrides,
     attr_int,
     attr_time,
     attr_txt_many,
@@ -484,6 +485,7 @@ def ical(ctx, ical_data, ical_file):
     if ctx.obj['ical_fragment']:
         ical = ical.replace('\nEND:', f"{ctx.obj['ical_fragment']}\nEND:")
     if 'BEGIN:VCALENDAR' in ical:
+        _warn_orphaned_overrides(ical)
         if ical.count('BEGIN:VCALENDAR') > 1:
             icals = _split_vcals(ical)
         else:
