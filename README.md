@@ -144,7 +144,20 @@ The file may look like this:
 }
 ```
 
-The file can be written by hand, or generated interactively with `plann configure` (experimental/under-tested - here be dragons).
+The file can be written by hand, or created and updated interactively with `plann configure` (experimental/under-tested - here be dragons).
+
+The connection settings (`caldav_url`, `caldav_user`, `caldav_pass`, `caldav_proxy`, ...) may refer to environment variables as `${VAR}`, or as `${VAR:-default}` with a fallback value.  This keeps secrets such as the password out of the file:
+
+```json
+{ "default":
+  { "caldav_url": "http://foo.bar.example.com/caldav/",
+    "caldav_user": "luser",
+    "caldav_pass": "${CALDAV_PASSWORD}"
+  }
+}
+```
+
+Only the connection settings are expanded; other keys, such as `calendar_url` and `calendar_name`, are used as written.
 
 A `features` key may be given to enable server-specific compatibility workarounds, referring to a server profile in the caldav library's `compatibility_hints` module (e.g. `"features": "ecloud"`).  For servers with a known profile, `caldav_url` may even be omitted - the caldav library will derive the URL from the profile.
 

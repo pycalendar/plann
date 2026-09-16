@@ -20,6 +20,7 @@ plann command subcommand --help
 
 ## Main commands
 
+* configure - create or update a section of the configuration file interactively.  This one is not used by the primary author and is probably under-tested.  Its primary intention is to make it easy for others to use the tool.
 * list-calendars - verify that it's possible to connect to the server(s) and show the calendar(s) selected
 * add - for adding things to the calendar(s)
 * select - for selecting, viewing, editing and deleting things from the calendar(s).
@@ -30,7 +31,6 @@ Those commands are made mostly for making `plann` more convenient to use for the
 
 * agenda - list up some of the upcoming events plus some of the upcoming tasks
 * interactive manage-tasks - go through your tasks and make suggestions
-* interactive update-config - (TODO: NOT IMPLEMENTED YET).  This one is not used by the primary author and is probably under-tested.  Its primary intention is to make it easy for others to use the tool.
 
 Note that many of those commands have only been tested on DAViCal (see the [`docs/CALENDAR_SERVER_RECOMMENDATIONS.md`](docs/CALENDAR_SERVER_RECOMMENDATIONS.md) file)
 
