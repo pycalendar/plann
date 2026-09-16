@@ -137,6 +137,12 @@ def test_configure_command_registered():
     assert 'configure' in cli.commands
 
 
+def test_update_config_command_dropped():
+    """`interactive update-config` never did anything but raise
+    NotImplementedError; `plann configure` is the configuration command."""
+    assert 'update-config' not in cli.commands['interactive'].commands
+
+
 def test_lazy_calendars_resolves_once():
     """_LazyCalendars defers discovery until first use, then caches it."""
     calls = []
