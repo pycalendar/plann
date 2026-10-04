@@ -36,11 +36,11 @@ Installs `plann` under `~/.local/` (no root required):
 
 ### Development Install
 
-For development work using Poetry:
+An editable install, so changes in the working tree take effect without reinstalling:
 
 1. Clone this repo, cd to `plann`
-2. `make dev`
-3. Run via `poetry run plann`
+2. `make dev` (installs with `pip install -e ".[dev]"`, including the test dependencies)
+3. Run via `plann`
 
 ### Tab completion
 
