@@ -50,10 +50,15 @@ dev = [
     "ruff>=0.1.0",
     "xandikos",
     "deptry>=0.24.0",
+    # a build backend, not a runtime dep - here so the tests can import and
+    # exercise hatch_build.py's completion hook
+    "hatchling",
 ]
 
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+# click is a runtime dependency too, but the build needs it as well:
+# hatch_build.py generates the shell completion files from it (see that file).
+requires = ["hatchling", "hatch-vcs", "click"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
@@ -61,6 +66,10 @@ source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "plann/_version.py"
+
+# hatch_build.py: generates the bash/zsh/fish completion files into the wheel's
+# shared-data, so tab-completion works with no shell rc editing.
+[tool.hatch.build.hooks.custom]
 
 [tool.hatch.build.targets.wheel]
 packages = ["plann"]

@@ -42,6 +42,14 @@ For development work using Poetry:
 2. `make dev`
 3. Run via `poetry run plann`
 
+### Tab completion
+
+The package ships completion scripts for bash, zsh and fish.  For a system-wide install under `/usr` (e.g. a distribution package) they work with no shell configuration - bash needs the `bash-completion` package installed, though.  For bash, a `--user`, venv, pipx or `uv tool` install also works out of the box with bash-completion 2.12 or newer, and fish picks up a `--user` install.  Elsewhere, point the shell at the install prefix:
+
+* zsh: `fpath=(<prefix>/share/zsh/site-functions $fpath)` before `compinit`
+* fish: `set -a fish_complete_path <prefix>/share/fish/vendor_completions.d`
+* bash: `source <prefix>/share/bash-completion/completions/plann`
+
 ## Support
 
 \#calendar-cli at irc.oftc.net (I'm not available 24/7 there), eventually support@plann.no, eventually the issue tracker at https://github.com/pycalendar/plann/issues
