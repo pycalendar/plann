@@ -110,6 +110,8 @@ exclude_lines = [
 
 [tool.deptry]
 pep621_dev_dependency_groups = ["dev"]
+## build hook, runs under the build backend - not part of the package
+extend_exclude = ['hatch_build\.py']
 
 [tool.deptry.per_rule_ignores]
 ## PyYAML is no longer imported directly, but it's still needed for yaml
