@@ -121,10 +121,9 @@ any more, and will happen as ordinary maintenance or not at all.  1.1, 1.2 and 1
 keep their deliverables but lose their slack - if any of them overruns, it comes out
 of Phase 2, not out of the other two.
 
-**Status:** 1.0 is all but done - PR #43 is merged, the orphaned-`RECURRENCE-ID`
-warning and the removal of the dead `interactive update-config` landed on top of it,
-and the changelog is closed as v1.2.0 - but the tag and the PyPI upload are still
-outstanding, so the item stays open until users can install it.  1.3 has its
+**Status:** 1.0 is done - PR #43 is merged, the orphaned-`RECURRENCE-ID` warning
+and the removal of the dead `interactive update-config` landed on top of it, and
+v1.2.0 is tagged and on PyPI.  1.3 has its
 credential half: connection settings in the config file now expand `${VAR}` and
 `${VAR:-default}`, documented in the README, which is also what closed 1.4 (see
 [PR #46](https://github.com/pycalendar/plann/pull/46), answered and closed on the
