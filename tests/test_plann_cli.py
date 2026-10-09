@@ -84,6 +84,49 @@ def test_set_task_attribs_prompts_missing_attribute():
     save.assert_called_once()
     assert 'work' in todo.data
 
+
+def test_set_task_attribs_skips_completed():
+    """A task marked "completed!" at the category prompt must not be
+    prompted for again for due/priority/duration - the task list is fetched
+    once, so the completed task must be dropped from it."""
+    todo = _make_todo('a')
+
+    def fake_select(ctx, **kwargs):
+        ctx.obj['objs'] = [todo]
+
+    ctx = _FakeCtx()
+    with patch.object(commands_mod, '_select', fake_select), \
+         patch.object(todo, 'save'), \
+         patch('plann.commands.click.echo'), \
+         patch('plann.commands.click.prompt', return_value='completed!') as prompt:
+        _set_task_attribs(ctx)
+
+    assert prompt.call_count == 1
+    assert todo.icalendar_component['STATUS'] == 'COMPLETED'
+
+
+def test_set_task_attribs_skips_completed_at_duration():
+    """A task given a due date, then marked "completed!" at the priority
+    prompt, must not come back at the duration prompt via the due step's
+    returned list."""
+    todo = _make_todo('a', category=True)
+
+    def fake_select(ctx, **kwargs):
+        ctx.obj['objs'] = [todo]
+
+    def fake_procrastinate(objs, due, **kwargs):
+        objs[0].icalendar_component.add('DUE', due)
+
+    ctx = _FakeCtx()
+    with patch.object(commands_mod, '_select', fake_select), \
+         patch.object(commands_mod, '_procrastinate', fake_procrastinate), \
+         patch.object(todo, 'save'), \
+         patch('plann.commands.click.echo'), \
+         patch('plann.commands.click.prompt', side_effect=['+2d', 'completed!']) as prompt:
+        _set_task_attribs(ctx)
+
+    assert prompt.call_count == 2
+
 _TODO = """BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN

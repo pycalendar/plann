@@ -9,6 +9,10 @@ and I do try to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 * Shell tab completion scripts (bash, zsh, fish) now ship with the package.  They work without shell configuration for system-wide installs (and for bash user/venv installs with bash-completion 2.12+); see the README for other setups.  The `make install-completion` targets are gone.
 
+### Fixed
+
+* `interactive set-task-attribs` (also run by `interactive manage-tasks`): a task marked `completed!` at one prompt was asked about again at the next one, and answering `completed!` there crashed on the already-completed task.  Regression in v1.2.0.
+
 ## v1.2.0 - 2026-09-16
 
 ### Added
