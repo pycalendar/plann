@@ -599,8 +599,10 @@ def _set_task_attribs(ctx):
 
         ## add all non-duplicated objects from objs to objs_
         uids_ = {x.icalendar_component['UID'] for x in objs_}
+        ## skip tasks answered "completed!" at an earlier attribute
+        pending = {id(x) for x in todos}
         for obj in objs or []:
-            if obj.icalendar_component['UID'] not in uids_:
+            if id(obj) in pending and obj.icalendar_component['UID'] not in uids_:
                 objs_.append(obj)
         objs = objs_
         if something == 'duration':
@@ -625,6 +627,9 @@ def _set_task_attribs(ctx):
                 if value == 'completed!':
                     obj.complete()
                     obj.save()
+                    ## todos is fetched once - drop the task so later
+                    ## attributes don't prompt for it again
+                    todos.remove(obj)
                     continue
                 if _is_comma_list_attr(something):
                     comp.add(something_, _comma_list_tokens(something, value))
